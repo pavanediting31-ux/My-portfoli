@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <!-- Outer Corner Brackets Frame (Off-white / Light) -->
+  <g stroke="#F1F1F1" stroke-width="12" stroke-linecap="square" fill="none">
+    <!-- Top Left Corner -->
+    <path d="M 25,65 V 25 H 65" />
+    <!-- Top Right Corner -->
+    <path d="M 135,25 H 175 V 65" />
+    <!-- Bottom Left Corner -->
+    <path d="M 25,135 V 175 H 65" />
+    <!-- Bottom Right Corner -->
+    <path d="M 135,175 H 175 V 135" />
+  </g>
+
+  <!-- Double Play / Forward Arrow Icons (Cinematic Accent Red) -->
+  <!-- Left Trapezoid Segment -->
+  <path d="M 72,62 L 105,80 V 120 L 72,138 Z" fill="#E63946" />
+  <!-- Right Triangle Segment -->
+  <path d="M 112,72 L 152,100 L 112,128 Z" fill="#E63946" />
+</svg>

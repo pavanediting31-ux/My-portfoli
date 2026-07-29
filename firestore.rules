@@ -1,0 +1,18 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Video collection security rules
+    match /videos/{videoId} {
+      allow read, write: if true;
+    }
+    
+    // Contact Messages collection security rules
+    match /messages/{messageId} {
+      allow read, write: if true;
+    }
+  }
+}
+
+

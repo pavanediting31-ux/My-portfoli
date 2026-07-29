@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAVAN PORTFOLIO — Admin Dashboard</title>
+
+    <!-- Fonts & Icons -->
+    <link
+        href="https://api.fontshare.com/v2/css?f[]=clash-display@300,400,500,600,700&f[]=general-sans@300,400,500,600,700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Admin Stylesheet -->
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+
+<body>
+
+    <!-- Authentication Screen -->
+    <div id="loginScreen" class="auth-container">
+        <div class="auth-card">
+            <div class="auth-logo-box">
+                <img src="assets/logo.svg" alt="Pavan Logo">
+                <h1>PAVAN ADMIN</h1>
+            </div>
+            <p class="auth-subtitle">Command Center &amp; Video Manager</p>
+
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="adminPassword">ADMIN PASSWORD</label>
+                    <input type="password" id="adminPassword" class="form-control" required placeholder="••••••••">
+                </div>
+                <div id="loginError" class="error-msg"></div>
+                <button type="submit" class="btn-primary" style="width:100%; padding:0.9rem; margin-top:0.5rem;">
+                    <span>AUTHENTICATE</span>
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                </button>
+                <a href="index.html" style="display:block; text-align:center; color:var(--muted-color); font-size:0.85rem; margin-top:1.25rem; text-decoration:none;"><i class="fa-solid fa-arrow-left"></i> Return to Public Site</a>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard Screen -->
+    <div id="dashboardScreen" class="dashboard-container hidden">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <img src="assets/logo.svg" alt="Pavan Logo">
+                <h2>PAVAN ADMIN</h2>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-link active" data-tab="tab-videos"><i class="fa-solid fa-video"></i> Video
+                    Manager</a>
+                <a href="#" class="nav-link" data-tab="tab-messages"><i class="fa-solid fa-envelope"></i> Client
+                    Messages <span id="navMsgBadge" class="badge-featured"
+                        style="margin-left:auto; background:var(--accent-color); color:#fff; font-size:0.75rem; padding:0.15rem 0.5rem; display:none;">0</span></a>
+                <a href="index.html" target="_blank" class="nav-link"><i class="fa-solid fa-globe"></i> View
+                    Homepage</a>
+                <a href="works.html" target="_blank" class="nav-link"><i class="fa-solid fa-grid-2"></i> View Works
+                    Page</a>
+            </nav>
+
+            <button id="logoutBtn" class="btn-logout">
+                <i class="fa-solid fa-power-off"></i>
+                <span>Logout</span>
+            </button>
+        </aside>
+
+        <main class="main-content">
+            <!-- TAB 1: VIDEO MANAGER -->
+            <div id="tab-videos" class="admin-tab-view">
+                <header class="dashboard-header">
+                    <div>
+                        <h1 class="page-title">Video Content Manager</h1>
+                        <p style="color:var(--muted-color); font-size:0.9rem; margin-top:0.25rem;">
+                            Add, feature, or delete videos for the Homepage 3D Stack and Works library without touching
+                            code.
+                        </p>
+                    </div>
+                    <div class="header-actions">
+                        <button id="resetDataBtn" class="btn-logout"
+                            style="background:transparent; border-color:var(--muted-color); color:var(--muted-color);"
+                            title="Clear all videos from catalog">
+                            <i class="fa-solid fa-trash-can"></i> Clear Catalog
+                        </button>
+                    </div>
+                </header>
+
+                <!-- Add Video Form -->
+                <section class="admin-card">
+                    <h2 class="card-title">
+                        <span><i class="fa-solid fa-plus-circle" style="color:var(--accent-color);"></i> Add New
+                            Video</span>
+                    </h2>
+
+                    <form id="addVideoForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="newVideoTitle">VIDEO TITLE</label>
+                                <input type="text" id="newVideoTitle" class="form-control" required
+                                    placeholder="e.g. Cyberpunk VFX Trailer">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="newVideoUrl">VIDEO URL OR EMBED CODE (Canva, YouTube, Vimeo, Drive, MP4)</label>
+                                <input type="text" id="newVideoUrl" class="form-control" required
+                                    placeholder="Paste Canva embed link, YouTube URL, Vimeo, Drive view link, or direct MP4 URL...">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="newVideoCategory">CATEGORY</label>
+                                <select id="newVideoCategory" class="form-control">
+                                    <option value="Short Form">Short Form / Reels</option>
+                                    <option value="Long Form">Long Form</option>
+                                    <option value="Commercial">Commercial</option>
+                                    <option value="Motion Graphics">Motion Graphics</option>
+                                    <option value="Thumbnails">Thumbnails / Graphic Design</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="newVideoOrientation">ORIENTATION / ASPECT RATIO</label>
+                                <select id="newVideoOrientation" class="form-control">
+                                    <option value="vertical">Vertical (9:16 - Reels / Shorts)</option>
+                                    <option value="horizontal">Horizontal (16:9 - Widescreen)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 1.5rem;">
+                            <label for="newVideoDesc">SHORT DESCRIPTION / TAGS</label>
+                            <input type="text" id="newVideoDesc" class="form-control"
+                                placeholder="Brief description of the edit or visual style...">
+                        </div>
+
+                        <div style="display:flex; flex-direction:column; gap:0.75rem; margin-top:1.5rem;">
+                            <div style="display:flex; align-items:center; gap:0.85rem;">
+                                <label class="switch">
+                                    <input type="checkbox" id="newVideoFeatured">
+                                    <span class="slider"></span>
+                                </label>
+                                <span style="font-size:0.9rem; font-weight:500;">Feature on Homepage (Top 5 Featured Reels Slider)</span>
+                            </div>
+
+                            <div style="display:flex; align-items:center; gap:0.85rem;">
+                                <label class="switch">
+                                    <input type="checkbox" id="newVideoSpotlight">
+                                    <span class="slider"></span>
+                                </label>
+                                <span style="font-size:0.9rem; font-weight:500; color:var(--text-color);">Set as Main Horizontal Spotlight Video (Widescreen Showcase)</span>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary" style="padding:0.85rem 2rem;">
+                                <i class="fa-solid fa-check"></i>
+                                <span>PUBLISH VIDEO</span>
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- Video Catalog Table -->
+                <section class="admin-card">
+                    <h2 class="card-title">
+                        <span><i class="fa-solid fa-list-check" style="color:var(--accent-color);"></i> Current Video Catalog</span>
+                    </h2>
+
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Video Title</th>
+                                    <th>Category</th>
+                                    <th>Format</th>
+                                    <th>Homepage 3D Stack</th>
+                                    <th>Main Spotlight</th>
+                                    <th>Status Badge</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminVideoTableBody">
+                                <!-- Populated via js/admin.js -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <!-- TAB 2: CLIENT MESSAGES & INQUIRIES -->
+            <div id="tab-messages" class="admin-tab-view hidden">
+                <header class="dashboard-header">
+                    <div>
+                        <h1 class="page-title">Client Messages &amp; Inquiries</h1>
+                        <p style="color:var(--muted-color); font-size:0.9rem; margin-top:0.25rem;">
+                            View and manage incoming project briefs and contact requests sent from the homepage.
+                        </p>
+                    </div>
+                    <div class="header-actions">
+                        <span id="msgCountBadge" class="badge-featured"
+                            style="background:var(--accent-color); color:#fff; font-size:0.85rem; padding:0.4rem 1rem;">0
+                            Messages</span>
+                    </div>
+                </header>
+
+                <section class="admin-card">
+                    <h2 class="card-title">
+                        <span><i class="fa-solid fa-envelope-open-text" style="color:var(--accent-color);"></i> Incoming
+                            Inquiries Inbox</span>
+                    </h2>
+
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Date &amp; Time</th>
+                                    <th>Client Name</th>
+                                    <th>Email Address</th>
+                                    <th>Project Brief / Details</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminMessagesTableBody">
+                                <!-- Populated via js/admin.js -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- App Scripts -->
+    <script src="js/data.js"></script>
+    <script type="module" src="js/admin.js"></script>
+</body>
+
+</html>
