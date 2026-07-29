@@ -6,10 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PAVAN PORTFOLIO — Admin Dashboard</title>
 
-    <!-- Fonts & Icons -->
-    <link
-        href="https://api.fontshare.com/v2/css?f[]=clash-display@300,400,500,600,700&f[]=general-sans@300,400,500,600,700&display=swap"
-        rel="stylesheet">
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Admin Stylesheet -->
@@ -23,18 +20,18 @@
         <div class="auth-card">
             <div class="auth-logo-box">
                 <img src="assets/logo.svg" alt="Pavan Logo">
-                <h1>PAVAN ADMIN</h1>
+                <h1>Pavan Admin</h1>
             </div>
             <p class="auth-subtitle">Command Center &amp; Video Manager</p>
 
             <form id="loginForm" class="auth-form">
                 <div class="form-group">
-                    <label for="adminPassword">ADMIN PASSWORD</label>
+                    <label for="adminPassword">Admin Password</label>
                     <input type="password" id="adminPassword" class="form-control" required placeholder="••••••••">
                 </div>
                 <div id="loginError" class="error-msg"></div>
                 <button type="submit" class="btn-primary" style="width:100%; padding:0.9rem; margin-top:0.5rem;">
-                    <span>AUTHENTICATE</span>
+                    <span>Authenticate</span>
                     <i class="fa-solid fa-right-to-bracket"></i>
                 </button>
                 <a href="index.html" style="display:block; text-align:center; color:var(--muted-color); font-size:0.85rem; margin-top:1.25rem; text-decoration:none;"><i class="fa-solid fa-arrow-left"></i> Return to Public Site</a>
@@ -47,7 +44,7 @@
         <aside class="sidebar">
             <div class="sidebar-brand">
                 <img src="assets/logo.svg" alt="Pavan Logo">
-                <h2>PAVAN ADMIN</h2>
+                <h2>Pavan Admin</h2>
             </div>
 
             <nav class="sidebar-nav">
@@ -98,19 +95,19 @@
                     <form id="addVideoForm">
                         <div class="form-grid">
                             <div class="form-group">
-                                <label for="newVideoTitle">VIDEO TITLE</label>
+                                <label for="newVideoTitle">Video Title</label>
                                 <input type="text" id="newVideoTitle" class="form-control" required
                                     placeholder="e.g. Cyberpunk VFX Trailer">
                             </div>
 
                             <div class="form-group">
-                                <label for="newVideoUrl">VIDEO URL OR EMBED CODE (Canva, YouTube, Vimeo, Drive, MP4)</label>
+                                <label for="newVideoUrl">Media URL or Embed Code (Canva, YouTube, Vimeo, Drive, MP4)</label>
                                 <input type="text" id="newVideoUrl" class="form-control" required
                                     placeholder="Paste Canva embed link, YouTube URL, Vimeo, Drive view link, or direct MP4 URL...">
                             </div>
 
                             <div class="form-group">
-                                <label for="newVideoCategory">CATEGORY</label>
+                                <label for="newVideoCategory">Category</label>
                                 <select id="newVideoCategory" class="form-control">
                                     <option value="Short Form">Short Form / Reels</option>
                                     <option value="Long Form">Long Form</option>
@@ -121,7 +118,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="newVideoOrientation">ORIENTATION / ASPECT RATIO</label>
+                                <label for="newVideoOrientation">Orientation / Aspect Ratio</label>
                                 <select id="newVideoOrientation" class="form-control">
                                     <option value="vertical">Vertical (9:16 - Reels / Shorts)</option>
                                     <option value="horizontal">Horizontal (16:9 - Widescreen)</option>
@@ -130,7 +127,7 @@
                         </div>
 
                         <div class="form-group" style="margin-top: 1.5rem;">
-                            <label for="newVideoDesc">SHORT DESCRIPTION / TAGS</label>
+                            <label for="newVideoDesc">Short Description / Tags</label>
                             <input type="text" id="newVideoDesc" class="form-control"
                                 placeholder="Brief description of the edit or visual style...">
                         </div>
@@ -156,7 +153,7 @@
                         <div class="form-actions">
                             <button type="submit" class="btn-primary" style="padding:0.85rem 2rem;">
                                 <i class="fa-solid fa-check"></i>
-                                <span>PUBLISH VIDEO</span>
+                                <span>Publish Video</span>
                             </button>
                         </div>
                     </form>
@@ -164,15 +161,26 @@
 
                 <!-- Video Catalog Table -->
                 <section class="admin-card">
-                    <h2 class="card-title">
-                        <span><i class="fa-solid fa-list-check" style="color:var(--accent-color);"></i> Current Video Catalog</span>
-                    </h2>
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1rem;">
+                        <h2 class="card-title" style="margin-bottom:0;">
+                            <span><i class="fa-solid fa-list-check" style="color:var(--accent-color);"></i> Current Video Catalog</span>
+                        </h2>
+
+                        <!-- Category Filter Pills -->
+                        <div class="catalog-filter-bar" style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                            <button class="admin-filter-pill active" data-admin-filter="all">All Items (<span id="countAll">0</span>)</button>
+                            <button class="admin-filter-pill" data-admin-filter="short-form">Reels / Shorts (<span id="countReels">0</span>)</button>
+                            <button class="admin-filter-pill" data-admin-filter="long-form">Long Form (<span id="countLong">0</span>)</button>
+                            <button class="admin-filter-pill" data-admin-filter="thumbnails">Thumbnails (<span id="countThumbs">0</span>)</button>
+                            <button class="admin-filter-pill" data-admin-filter="featured">Featured 3D (<span id="countFeatured">0</span>)</button>
+                        </div>
+                    </div>
 
                     <div class="table-container">
                         <table class="admin-table">
                             <thead>
                                 <tr>
-                                    <th>Video Title</th>
+                                    <th>Title &amp; Preview</th>
                                     <th>Category</th>
                                     <th>Format</th>
                                     <th>Homepage 3D Stack</th>
@@ -187,6 +195,83 @@
                         </table>
                     </div>
                 </section>
+            </div>
+
+            <!-- Edit Item Modal -->
+            <div id="editVideoModal" class="admin-modal-overlay hidden" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); backdrop-filter:blur(12px); z-index:9999; display:flex; align-items:center; justify-content:center; padding:1.5rem;">
+                <div class="admin-modal-card" style="background:var(--surface-color); border:1px solid rgba(255,255,255,0.12); border-radius:16px; width:100%; max-width:640px; padding:2rem; max-height:90vh; overflow-y:auto; position:relative; box-shadow:0 25px 60px rgba(0,0,0,0.8);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:1rem;">
+                        <h3 style="font-family:var(--font-heading); font-size:1.4rem; color:#fff; display:flex; align-items:center; gap:0.5rem; margin:0;">
+                            <i class="fa-solid fa-pen-to-square" style="color:var(--accent-color);"></i> Edit Item Details
+                        </h3>
+                        <button type="button" id="closeEditModalBtn" style="background:none; border:none; color:var(--muted-color); font-size:1.5rem; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+
+                    <form id="editVideoForm">
+                        <input type="hidden" id="editVideoId">
+                        <div class="form-group">
+                            <label for="editVideoTitle">TITLE</label>
+                            <input type="text" id="editVideoTitle" class="form-control" required placeholder="e.g. Cinematic Showreel">
+                        </div>
+
+                        <div class="form-group" style="margin-top:1rem;">
+                            <label for="editVideoUrl">MEDIA URL OR EMBED LINK (Canva, YouTube, Vimeo, Drive, Image, MP4)</label>
+                            <input type="text" id="editVideoUrl" class="form-control" required placeholder="Paste media link...">
+                        </div>
+
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:1rem;">
+                            <div class="form-group">
+                                <label for="editVideoCategory">CATEGORY</label>
+                                <select id="editVideoCategory" class="form-control">
+                                    <option value="Short Form">Short Form / Reels</option>
+                                    <option value="Long Form">Long Form</option>
+                                    <option value="Commercial">Commercial</option>
+                                    <option value="Motion Graphics">Motion Graphics</option>
+                                    <option value="Thumbnails">Thumbnails / Graphic Design</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="editVideoOrientation">ORIENTATION</label>
+                                <select id="editVideoOrientation" class="form-control">
+                                    <option value="vertical">Vertical (9:16 - Reels / Shorts)</option>
+                                    <option value="horizontal">Horizontal (16:9 - Widescreen)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top:1rem;">
+                            <label for="editVideoDesc">SHORT DESCRIPTION / TAGS</label>
+                            <input type="text" id="editVideoDesc" class="form-control" placeholder="Brief description...">
+                        </div>
+
+                        <div style="display:flex; flex-direction:column; gap:0.75rem; margin-top:1.25rem;">
+                            <div style="display:flex; align-items:center; gap:0.85rem;">
+                                <label class="switch">
+                                    <input type="checkbox" id="editVideoFeatured">
+                                    <span class="slider"></span>
+                                </label>
+                                <span style="font-size:0.9rem; font-weight:500; color:#fff;">Feature on Homepage (Top 5 Featured Reels Slider)</span>
+                            </div>
+
+                            <div style="display:flex; align-items:center; gap:0.85rem;">
+                                <label class="switch">
+                                    <input type="checkbox" id="editVideoSpotlight">
+                                    <span class="slider"></span>
+                                </label>
+                                <span style="font-size:0.9rem; font-weight:500; color:#fff;">Set as Main Horizontal Spotlight Video</span>
+                            </div>
+                        </div>
+
+                        <div class="form-actions" style="margin-top:1.5rem; display:flex; justify-content:flex-end; gap:0.75rem;">
+                            <button type="button" id="cancelEditBtn" class="btn-logout" style="background:transparent; border-color:var(--muted-color); color:var(--muted-color); padding:0.6rem 1.25rem;">Cancel</button>
+                            <button type="submit" class="btn-primary" style="padding:0.6rem 1.75rem;">
+                                <i class="fa-solid fa-floppy-disk"></i>
+                                <span>SAVE CHANGES</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
 
             <!-- TAB 2: CLIENT MESSAGES & INQUIRIES -->

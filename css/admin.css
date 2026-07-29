@@ -3,6 +3,23 @@
    Palette: #0D0D0D, #1A1A1A, #E63946, #8A8A8A, #F1F1F1
    ========================================================================== */
 
+/* Local Custom Fonts */
+@font-face {
+    font-family: 'Cormorant Garamond';
+    src: url('../assets/CormorantGaramond-SemiBoldItalic.ttf') format('truetype');
+    font-weight: 600;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Helvetica Custom';
+    src: url('../assets/helvetica-regular-1-2_ufonts.com.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
 :root {
     --bg-color: #0D0D0D;
     --surface-color: #1A1A1A;
@@ -10,8 +27,8 @@
     --muted-color: #8A8A8A;
     --text-color: #F1F1F1;
 
-    --font-heading: 'Clash Display', 'Inter', sans-serif;
-    --font-body: 'General Sans', 'Inter', sans-serif;
+    --font-heading: 'Cormorant Garamond', Georgia, serif;
+    --font-body: 'Helvetica Custom', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 *,
@@ -245,7 +262,6 @@ body {
     font-weight: 600;
     letter-spacing: 1px;
     color: var(--muted-color);
-    text-transform: uppercase;
 }
 
 .form-control {
@@ -323,7 +339,6 @@ select.form-control {
     font-family: var(--font-heading);
     font-size: 0.8rem;
     letter-spacing: 1px;
-    text-transform: uppercase;
     border-bottom: 1px solid rgba(241, 241, 241, 0.1);
 }
 
@@ -496,4 +511,71 @@ input:checked+.slider:before {
 
 .admin-toast.info i {
     color: #3498db;
+}
+
+/* Catalog Category Filter Pills */
+button.admin-filter-pill {
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    font-family: var(--font-body) !important;
+    outline: none !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: rgba(241, 241, 241, 0.75) !important;
+    padding: 0.45rem 1rem !important;
+    border-radius: 50px !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.25s ease !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.35rem !important;
+    white-space: nowrap !important;
+    line-height: 1.2 !important;
+}
+
+button.admin-filter-pill:hover {
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+button.admin-filter-pill.active {
+    background: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 15px rgba(230, 57, 70, 0.45) !important;
+}
+
+/* Category Badges in Table */
+.cat-badge {
+    display: inline-block !important;
+    padding: 0.35rem 0.75rem !important;
+    border-radius: 6px !important;
+    font-size: 0.725rem !important;
+    font-weight: 700 !important;
+    white-space: nowrap !important;
+    letter-spacing: 0.5px !important;
+    line-height: 1.2 !important;
+}
+
+.cat-badge.reel {
+    background: rgba(230, 57, 70, 0.15) !important;
+    color: var(--accent-color) !important;
+    border: 1px solid rgba(230, 57, 70, 0.35) !important;
+}
+
+.cat-badge.thumb {
+    background: rgba(168, 85, 247, 0.15) !important;
+    color: #c084fc !important;
+    border: 1px solid rgba(168, 85, 247, 0.35) !important;
+}
+
+.cat-badge.long {
+    background: rgba(241, 196, 15, 0.15) !important;
+    color: #f1c40f !important;
+    border: 1px solid rgba(241, 196, 15, 0.35) !important;
 }

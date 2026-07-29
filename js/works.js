@@ -45,11 +45,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (currentFilter !== 'all') {
             if (currentFilter === 'short-form') {
-                filteredVideos = videos.filter(v => !isThumbCategory(v) && (v.category === 'Short Form' || v.orientation === 'vertical'));
+                filteredVideos = videos.filter(v => !isThumbCategory(v) && v.category === 'Short Form');
             } else if (currentFilter === 'long-form') {
-                filteredVideos = videos.filter(v => !isThumbCategory(v) && (v.category === 'Long Form' || v.category === 'Commercial' || v.category === 'Motion Graphics' || v.orientation === 'horizontal'));
-            } else if (currentFilter === 'vertical') {
-                filteredVideos = videos.filter(v => !isThumbCategory(v) && v.orientation === 'vertical');
+                filteredVideos = videos.filter(v => !isThumbCategory(v) && (v.category === 'Long Form' || v.category === 'Commercial' || v.category === 'Motion Graphics'));
             } else if (currentFilter === 'thumbnails') {
                 filteredVideos = videos.filter(v => isThumbCategory(v));
             } else {
@@ -62,9 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (filteredVideos.length === 0) {
             videoGrid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--muted-color); padding: 3rem;">No videos found in this category.</div>`;
             return;
-        }
-
-        filteredVideos.forEach(video => {
+        }        filteredVideos.forEach(video => {
             const card = document.createElement('div');
             card.className = 'video-card';
             card.setAttribute('data-id', video.id);
@@ -72,10 +68,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const isVert = video.orientation === 'vertical';
             const isThumb = video.category === 'Thumbnails' || video.category === 'Thumbnail Design';
 
+            const previewMediaHTML = renderUniversalVideoHTML(video.url, { isThumbnail: isThumb, muted: true, controls: false, class: 'video-thumb-media' });
+            const thumbClass = isThumb ? 'thumbnail-graphic' : (isVert ? 'vertical' : '');
+
             card.innerHTML = `
-                <div class="video-card-thumb ${isVert ? 'vertical' : ''}" data-url="${video.url}">
-                    ${isThumb ? renderUniversalVideoHTML(video.url, { isThumbnail: true }) : '<div class="video-placeholder-poster"></div>'}
-                    <span class="video-card-badge">${isThumb ? 'GRAPHIC' : video.orientation.toUpperCase()}</span>
+                <div class="video-card-thumb ${thumbClass}" data-url="${video.url}">
+                    ${previewMediaHTML}
+                    <span class="video-card-badge">${isThumb ? 'GRAPHIC' : (video.orientation ? video.orientation.toUpperCase() : 'VIDEO')}</span>
                     ${!isThumb ? '<div class="video-card-play-overlay">▶</div>' : ''}
                 </div>
                 <div class="video-card-info">
@@ -86,28 +85,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
             `;
-
-            const thumbBox = card.querySelector('.video-card-thumb');
-            if (!isThumb) {
-                card.addEventListener('mouseenter', () => {
-                    if (thumbBox && !thumbBox.querySelector('video') && !thumbBox.querySelector('img')) {
-                        const videoUrl = thumbBox.getAttribute('data-url');
-                        const vid = document.createElement('video');
-                        vid.src = `${videoUrl}#t=0.1`;
-                        vid.muted = true;
-                        vid.playsInline = true;
-                        vid.autoplay = true;
-                        thumbBox.appendChild(vid);
-                    }
-                });
-
-                card.addEventListener('mouseleave', () => {
-                    if (thumbBox) {
-                        const vid = thumbBox.querySelector('video');
-                        if (vid) vid.remove();
-                    }
-                });
-            }
 
             card.addEventListener('click', () => {
                 openVideoModal(video);
@@ -142,12 +119,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // 2. Canva Embed links
+        // 2. Canva Embed links (Canva graphics render as view embed, videos render as watch embed)
         if (cleanUrl.includes('canva.com')) {
             let embedUrl = cleanUrl;
             if (isThumbnail) {
                 if (embedUrl.includes('/watch?embed')) {
                     embedUrl = embedUrl.replace('/watch?embed', '/view?embed');
+                } else if (embedUrl.includes('/watch')) {
+                    embedUrl = embedUrl.replace('/watch', '/view?embed');
                 } else if (!embedUrl.includes('embed')) {
                     embedUrl = embedUrl + (embedUrl.includes('?') ? '&embed' : '?embed');
                 }
@@ -172,42 +151,38 @@ document.addEventListener('DOMContentLoaded', () => {
             return { type: 'iframe', url: embedUrl };
         }
 
-        // 4. Strict Thumbnail Mode: All Cloudinary, Firebase Storage, Google Drive & direct links MUST render as pure Images!
-        if (isThumbnail) {
-            if (cleanUrl.includes('drive.google.com')) {
-                const driveMatch = cleanUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
-                if (driveMatch && driveMatch[1]) {
+        // 4. Google Drive
+        if (cleanUrl.includes('drive.google.com')) {
+            const driveMatch = cleanUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+            if (driveMatch && driveMatch[1]) {
+                if (isThumbnail) {
                     return { type: 'image', url: `https://drive.google.com/uc?export=view&id=${driveMatch[1]}` };
                 }
+                return { type: 'iframe', url: `https://drive.google.com/file/d/${driveMatch[1]}/preview` };
             }
+        }
+
+        // 5. Direct Images (.jpg, .png, .webp, .svg, Unsplash, Imgur, Cloudinary image)
+        if (/\.(jpeg|jpg|png|gif|webp|svg)(\?.*)?$/i.test(cleanUrl) || cleanUrl.includes('images.unsplash.com') || cleanUrl.includes('imgur.com') || cleanUrl.includes('/image/upload/')) {
             return { type: 'image', url: cleanUrl };
         }
 
-        // 5. Direct Image files (.jpg, .jpeg, .png, .gif, .webp, .svg, Unsplash, Imgur)
-        if (/\.(jpeg|jpg|png|gif|webp|svg)(\?.*)?$/i.test(cleanUrl) || cleanUrl.includes('images.unsplash.com') || cleanUrl.includes('imgur.com')) {
+        // 6. Generic Iframe / Embed links
+        if (cleanUrl.includes('/embed') || cleanUrl.includes('player.')) {
+            return { type: 'iframe', url: cleanUrl };
+        }
+
+        // 7. Thumbnail Fallback
+        if (isThumbnail) {
             return { type: 'image', url: cleanUrl };
         }
 
-        // 6. Vimeo
+        // 8. Vimeo
         const vimeoMatch = cleanUrl.match(/vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)/i);
         if (vimeoMatch && vimeoMatch[1]) {
             const videoId = vimeoMatch[1];
             const embedUrl = `https://player.vimeo.com/video/${videoId}?autoplay=1&muted=0&loop=1`;
             return { type: 'iframe', url: embedUrl };
-        }
-
-        // 7. Google Drive Video
-        if (cleanUrl.includes('drive.google.com')) {
-            const driveMatch = cleanUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
-            if (driveMatch && driveMatch[1]) {
-                const embedUrl = `https://drive.google.com/file/d/${driveMatch[1]}/preview`;
-                return { type: 'iframe', url: embedUrl };
-            }
-        }
-
-        // 8. Generic Iframe / Embed links
-        if (cleanUrl.includes('/embed') || cleanUrl.includes('player.')) {
-            return { type: 'iframe', url: cleanUrl };
         }
 
         // Default: Direct Video URL
@@ -220,44 +195,73 @@ document.addEventListener('DOMContentLoaded', () => {
         const extraClass = options.class ? `class="${options.class}"` : '';
 
         if (parsed.type === 'image') {
-            return `<img src="${parsed.url}" ${extraClass} alt="Thumbnail Graphic" loading="lazy" style="width:100%; max-height:75vh; object-fit:contain; display:block; margin:0 auto; border-radius:8px;">`;
+            return `<img src="${parsed.url}" ${extraClass} alt="Graphic Thumbnail" loading="lazy" style="width:100%; height:100%; object-fit:cover; display:block; border-radius:8px;">`;
         } else if (parsed.type === 'iframe') {
-            return `<iframe src="${parsed.url}" ${extraClass} frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen style="width:100%; height:100%; min-height:480px; border:none; pointer-events:auto;"></iframe>`;
+            return `<iframe src="${parsed.url}" ${extraClass} frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" allowfullscreen style="width:100%; height:100%; min-height:420px; border:none; pointer-events:auto;"></iframe>`;
         } else {
-            const controls = options.controls !== false ? 'controls' : '';
-            const autoplay = options.autoplay !== false ? 'autoplay' : '';
+            const controls = options.controls === true ? 'controls' : '';
+            const autoplay = options.autoplay ? 'autoplay' : '';
             const muted = options.muted ? 'muted' : '';
             const loop = options.loop !== false ? 'loop' : '';
-            return `<video src="${parsed.url}#t=0.1" ${extraClass} ${controls} ${autoplay} ${muted} ${loop} playsinline preload="metadata" style="width:100%; height:100%; object-fit:contain;"></video>`;
+            const srcUrl = options.controls ? parsed.url : `${parsed.url}#t=0.1`;
+            const fitMode = options.controls ? (options.isVertical ? 'cover' : 'contain') : 'cover';
+            return `<video src="${srcUrl}" ${extraClass} ${controls} ${autoplay} ${muted} ${loop} playsinline webkit-playsinline preload="metadata" style="width:100%; height:100%; object-fit:${fitMode}; pointer-events:${options.controls ? 'auto' : 'none'};"></video>`;
         }
     }
 
-    // Lightbox Modal Player / Image Viewer
+    // Lightbox Modal Player / Pure Image Viewer
     function openVideoModal(video) {
         if (!videoModal) return;
 
         const isThumb = video.category === 'Thumbnails' || video.category === 'Thumbnail Design';
+        const isVert = video.orientation === 'vertical';
+        const modalContainer = videoModal.querySelector('.video-modal-container');
         const modalBody = videoModal.querySelector('.video-modal-body');
 
-        if (modalBody) {
+        if (modalContainer) {
+            modalContainer.classList.remove('vertical-modal');
+            modalContainer.classList.remove('image-modal');
+
             if (isThumb) {
-                modalBody.innerHTML = renderUniversalVideoHTML(video.url, { isThumbnail: true });
-            } else {
-                modalBody.innerHTML = renderUniversalVideoHTML(video.url, { controls: true, autoplay: true, muted: false });
+                modalContainer.classList.add('image-modal');
+            } else if (isVert) {
+                modalContainer.classList.add('vertical-modal');
             }
+        }
+
+        if (modalBody) {
+            modalBody.innerHTML = renderUniversalVideoHTML(video.url, {
+                controls: !isThumb,
+                autoplay: !isThumb,
+                muted: isThumb,
+                isThumbnail: isThumb,
+                isVertical: isVert
+            });
         }
 
         if (modalTitle) modalTitle.textContent = video.title;
         if (modalDesc) {
             modalDesc.textContent = isThumb
                 ? `${video.category} • Graphic Design Showcase`
-                : (video.description || `${video.category} • ${video.orientation.toUpperCase()} Video`);
+                : (video.description || `${video.category} • ${video.orientation ? video.orientation.toUpperCase() : 'VIDEO'}`);
         }
         videoModal.classList.add('active');
 
         if (!isThumb) {
             const activeVid = modalBody ? modalBody.querySelector('video') : null;
-            if (activeVid) activeVid.play().catch(e => console.warn(e));
+            if (activeVid) {
+                activeVid.muted = false;
+                activeVid.playsInline = true;
+                activeVid.setAttribute('playsinline', '');
+                activeVid.setAttribute('webkit-playsinline', '');
+                const playPromise = activeVid.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(() => {
+                        activeVid.muted = true;
+                        activeVid.play().catch(e => console.warn("Mobile modal playback fallback:", e));
+                    });
+                }
+            }
         }
     }
 

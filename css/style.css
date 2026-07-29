@@ -8,6 +8,23 @@
    --text-color: #F1F1F1
    ========================================================================== */
 
+/* Local Custom Fonts */
+@font-face {
+    font-family: 'Cormorant Garamond';
+    src: url('../assets/CormorantGaramond-SemiBoldItalic.ttf') format('truetype');
+    font-weight: 600;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Helvetica Custom';
+    src: url('../assets/helvetica-regular-1-2_ufonts.com.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
 :root {
     --bg-color: #0D0D0D;
     --surface-color: #1A1A1A;
@@ -15,8 +32,8 @@
     --muted-color: #8A8A8A;
     --text-color: #F1F1F1;
 
-    --font-heading: 'Clash Display', 'Inter', sans-serif;
-    --font-body: 'General Sans', 'Inter', sans-serif;
+    --font-heading: 'Cormorant Garamond', Georgia, serif;
+    --font-body: 'Helvetica Custom', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 
     --radius-sm: 8px;
     --radius-md: 16px;
@@ -146,7 +163,6 @@ video {
     font-weight: 700;
     letter-spacing: 4px;
     color: var(--text-color);
-    text-transform: uppercase;
 }
 
 .preloader-title span {
@@ -366,7 +382,6 @@ video {
     font-size: 0.85rem;
     color: var(--muted-color);
     letter-spacing: 1px;
-    text-transform: uppercase;
 }
 
 .minimal-badge .badge-icon {
@@ -386,7 +401,6 @@ video {
     line-height: 1.1;
     letter-spacing: -1px;
     color: var(--text-color);
-    text-transform: uppercase;
 }
 
 .minimal-title .text-italic {
@@ -474,20 +488,18 @@ video {
 
 .section-tag {
     font-family: var(--font-heading);
-    font-size: 0.8rem;
-    font-weight: 600;
-    letter-spacing: 3px;
+    font-size: 3.25rem;
+    font-weight: 700;
+    letter-spacing: 2px;
     color: var(--accent-color);
-    text-transform: uppercase;
 }
 
 .section-title {
     font-family: var(--font-heading);
-    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-size: clamp(2.4rem, 5vw, 3.8rem);
     font-weight: 700;
     letter-spacing: -0.5px;
     color: var(--text-color);
-    text-transform: uppercase;
 }
 
 .section-subtitle {
@@ -545,11 +557,20 @@ video {
     background-color: #111;
 }
 
-.card-video-wrapper video {
+.card-video-wrapper video,
+.card-video-wrapper iframe,
+.card-video-wrapper img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: cover !important;
     pointer-events: none;
+    border: none;
+}
+
+.stacked-card.playing .card-video-wrapper video,
+.stacked-card.playing .card-video-wrapper iframe {
+    pointer-events: auto !important;
+    object-fit: cover !important;
 }
 
 /* Card 3D Stack Positions */
@@ -633,7 +654,6 @@ video {
     letter-spacing: 1.5px;
     padding: 0.35rem 0.75rem;
     border-radius: 50px;
-    text-transform: uppercase;
 }
 
 .p3d-play-btn {
@@ -690,11 +710,14 @@ video {
 }
 
 .stacked-card.playing .p3d-play-btn,
+.stacked-card.playing .play-pulse-ring,
 .stacked-card.playing .card-overlay-gradient,
 .stacked-card.playing .card-top-badge,
 .stacked-card.playing .card-bottom-info {
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .card-bottom-info {
@@ -719,7 +742,6 @@ video {
     font-size: 0.75rem;
     color: var(--accent-color);
     font-weight: 600;
-    text-transform: uppercase;
     letter-spacing: 1px;
 }
 
@@ -815,12 +837,11 @@ video {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 0.75rem;
+    font-size: 1.1rem;
     font-weight: 700;
     letter-spacing: 1.5px;
     color: var(--accent-color);
     margin-bottom: 0.5rem;
-    text-transform: uppercase;
 }
 
 .more-videos-info h3 {
@@ -896,12 +917,11 @@ video {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 0.75rem;
+    font-size: 1.1rem;
     font-weight: 700;
     letter-spacing: 1.5px;
     color: var(--accent-color);
     margin-bottom: 0.5rem;
-    text-transform: uppercase;
 }
 
 .spotlight-title {
@@ -996,11 +1016,10 @@ video {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    font-size: 0.7rem;
+    font-size: 1.05rem;
     font-weight: 700;
     letter-spacing: 1px;
     color: var(--accent-color);
-    text-transform: uppercase;
 }
 
 
@@ -1082,16 +1101,32 @@ video {
     max-height: 420px;
 }
 
+.video-card-thumb.thumbnail-graphic {
+    aspect-ratio: 16 / 9;
+    background-color: #111;
+}
+
+.video-card-thumb.thumbnail-graphic img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
+}
+
 .video-placeholder-poster {
     width: 100%;
     height: 100%;
     background: linear-gradient(135deg, #1f1f1f 0%, #0d0d0d 100%);
 }
 
-.video-card-thumb video {
+.video-card-thumb video,
+.video-card-thumb iframe,
+.video-card-thumb img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    pointer-events: none;
+    border: none;
 }
 
 .video-card-badge {
@@ -1183,6 +1218,30 @@ video {
     border-radius: var(--radius-lg);
     border: 1px solid rgba(241, 241, 241, 0.15);
     overflow: hidden;
+    transition: max-width 0.35s ease;
+}
+
+/* 9:16 Vertical Reel Smartphone Player Modal */
+.video-modal-container.vertical-modal {
+    max-width: 410px;
+    width: 92vw;
+    border-color: rgba(230, 57, 70, 0.4);
+    box-shadow: 0 0 50px rgba(230, 57, 70, 0.25);
+}
+
+/* Graphic Thumbnail Pure Image Lightbox Modal */
+.video-modal-container.image-modal {
+    max-width: 1050px;
+    width: 92vw;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.video-modal-container.image-modal .video-modal-body {
+    background: transparent !important;
+    padding: 0 !important;
+    max-height: 85vh;
 }
 
 .video-modal-close {
@@ -1213,12 +1272,30 @@ video {
     display: flex;
     justify-content: center;
     background: #000;
+    overflow: hidden;
 }
 
-.video-modal-body video {
+.video-modal-container.vertical-modal .video-modal-body {
+    aspect-ratio: 9 / 16;
+    height: 72vh;
+    max-height: 650px;
+}
+
+.video-modal-body video,
+.video-modal-body iframe {
     width: 100%;
+    height: 100%;
     max-height: 75vh;
     object-fit: contain;
+    border: none;
+}
+
+.video-modal-container.vertical-modal .video-modal-body video,
+.video-modal-container.vertical-modal .video-modal-body iframe {
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    object-fit: cover !important;
 }
 
 .video-modal-footer {
@@ -1297,7 +1374,6 @@ video {
     color: var(--accent-color);
     font-weight: 600;
     letter-spacing: 2px;
-    text-transform: uppercase;
 }
 
 .about-details {
@@ -1481,7 +1557,6 @@ video {
     font-size: 0.8rem;
     letter-spacing: 1px;
     color: var(--muted-color);
-    text-transform: uppercase;
 }
 
 .form-control {
@@ -1594,4 +1669,71 @@ footer {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Admin Catalog Category Filter Pills */
+button.admin-filter-pill {
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    font-family: inherit !important;
+    outline: none !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: rgba(241, 241, 241, 0.75) !important;
+    padding: 0.45rem 1rem !important;
+    border-radius: 50px !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.25s ease !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.35rem !important;
+    white-space: nowrap !important;
+    line-height: 1.2 !important;
+}
+
+button.admin-filter-pill:hover {
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+button.admin-filter-pill.active {
+    background: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 15px rgba(230, 57, 70, 0.45) !important;
+}
+
+/* Category Badges in Table */
+.cat-badge {
+    display: inline-block !important;
+    padding: 0.35rem 0.75rem !important;
+    border-radius: 6px !important;
+    font-size: 0.725rem !important;
+    font-weight: 700 !important;
+    white-space: nowrap !important;
+    letter-spacing: 0.5px !important;
+    line-height: 1.2 !important;
+}
+
+.cat-badge.reel {
+    background: rgba(230, 57, 70, 0.15) !important;
+    color: var(--accent-color) !important;
+    border: 1px solid rgba(230, 57, 70, 0.35) !important;
+}
+
+.cat-badge.thumb {
+    background: rgba(168, 85, 247, 0.15) !important;
+    color: #c084fc !important;
+    border: 1px solid rgba(168, 85, 247, 0.35) !important;
+}
+
+.cat-badge.long {
+    background: rgba(241, 196, 15, 0.15) !important;
+    color: #f1c40f !important;
+    border: 1px solid rgba(241, 196, 15, 0.35) !important;
 }

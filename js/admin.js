@@ -235,18 +235,55 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    let currentAdminFilter = 'all';
+
+    // Catalog Category Filter Pills Click Handler
+    document.querySelectorAll('.admin-filter-pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+            document.querySelectorAll('.admin-filter-pill').forEach(p => p.classList.remove('active'));
+            pill.classList.add('active');
+            currentAdminFilter = pill.getAttribute('data-admin-filter');
+            initVideoTable();
+        });
+    });
+
     // Render Admin Table Rows
     function renderAdminVideosTable(videos) {
         if (!adminVideoTableBody) return;
 
         adminVideoTableBody.innerHTML = '';
 
-        if (videos.length === 0) {
-            adminVideoTableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--muted-color); padding: 2.5rem 1rem;">No videos in catalog. Use the form above to add videos.</td></tr>`;
+        // Update Pill Counters
+        const countAllEl = document.getElementById('countAll');
+        const countReelsEl = document.getElementById('countReels');
+        const countLongEl = document.getElementById('countLong');
+        const countThumbsEl = document.getElementById('countThumbs');
+        const countFeaturedEl = document.getElementById('countFeatured');
+
+        if (countAllEl) countAllEl.textContent = videos.length;
+        if (countReelsEl) countReelsEl.textContent = videos.filter(v => v.category === 'Short Form').length;
+        if (countLongEl) countLongEl.textContent = videos.filter(v => v.category === 'Long Form' || v.category === 'Commercial' || v.category === 'Motion Graphics').length;
+        if (countThumbsEl) countThumbsEl.textContent = videos.filter(v => v.category === 'Thumbnails' || v.category === 'Thumbnail Design').length;
+        if (countFeaturedEl) countFeaturedEl.textContent = videos.filter(v => v.isFeatured).length;
+
+        // Apply Active Filter
+        let filteredVideos = videos;
+        if (currentAdminFilter === 'short-form') {
+            filteredVideos = videos.filter(v => v.category === 'Short Form');
+        } else if (currentAdminFilter === 'long-form') {
+            filteredVideos = videos.filter(v => v.category === 'Long Form' || v.category === 'Commercial' || v.category === 'Motion Graphics');
+        } else if (currentAdminFilter === 'thumbnails') {
+            filteredVideos = videos.filter(v => v.category === 'Thumbnails' || v.category === 'Thumbnail Design');
+        } else if (currentAdminFilter === 'featured') {
+            filteredVideos = videos.filter(v => v.isFeatured);
+        }
+
+        if (filteredVideos.length === 0) {
+            adminVideoTableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--muted-color); padding: 2.5rem 1rem;">No items found matching the selected filter.</td></tr>`;
             return;
         }
 
-        videos.forEach((video) => {
+        filteredVideos.forEach((video) => {
             const tr = document.createElement('tr');
             let statusBadges = [];
             if (video.isFeatured) statusBadges.push('<span class="badge-featured">Homepage 3D Reel</span>');
@@ -256,14 +293,24 @@ document.addEventListener('DOMContentLoaded', () => {
             const isThumb = video.category === 'Thumbnails' || video.category === 'Thumbnail Design';
             const mediaPreviewHTML = renderUniversalVideoHTML(video.url, { isThumbnail: isThumb, muted: true, class: 'video-thumb-preview' });
 
+            let categoryBadgeHTML = `<span class="cat-badge reel">Short Form</span>`;
+            if (isThumb) {
+                categoryBadgeHTML = `<span class="cat-badge thumb">Thumbnail</span>`;
+            } else if (video.category === 'Long Form' || video.category === 'Commercial' || video.category === 'Motion Graphics') {
+                categoryBadgeHTML = `<span class="cat-badge long">Long Form</span>`;
+            }
+
             tr.innerHTML = `
                 <td>
                     <div style="display:flex; align-items:center; gap:0.75rem;">
                         ${mediaPreviewHTML}
-                        <strong>${video.title}</strong>
+                        <div>
+                            <strong>${video.title}</strong>
+                            ${video.description ? `<br><small style="color:var(--muted-color); font-size:0.75rem;">${video.description}</small>` : ''}
+                        </div>
                     </div>
                 </td>
-                <td>${video.category}</td>
+                <td>${categoryBadgeHTML}</td>
                 <td><span style="text-transform:capitalize;">${video.orientation}</span></td>
                 <td>
                     <label class="switch">
@@ -283,8 +330,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </td>
                 <td>
-                    <div class="action-btns">
-                        <button class="btn-icon delete" data-id="${video.id}" title="Delete Video"><i class="fa-solid fa-trash"></i></button>
+                    <div class="action-btns" style="display:flex; gap:0.4rem;">
+                        <button class="btn-icon edit" data-id="${video.id}" title="Edit Item Details" style="background:rgba(52,152,219,0.2); border-color:rgba(52,152,219,0.5); color:#3498db;"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button class="btn-icon delete" data-id="${video.id}" title="Delete Item"><i class="fa-solid fa-trash"></i></button>
                     </div>
                 </td>
             `;
@@ -299,6 +347,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const spotlightInput = tr.querySelector('.spotlight-toggle');
             spotlightInput.addEventListener('change', (e) => {
                 toggleSpotlightStatus(video.id, e.target.checked);
+            });
+
+            // Edit Item Event
+            const editBtn = tr.querySelector('.btn-icon.edit');
+            editBtn.addEventListener('click', () => {
+                openEditModal(video);
             });
 
             // Delete Video Event
@@ -469,7 +523,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Delete Video
     async function deleteVideo(videoId) {
-        if (confirm('Are you sure you want to delete this video?')) {
+        if (confirm('Are you sure you want to delete this item?')) {
             let videos = getStoredVideos();
             videos = videos.filter(v => v.id !== videoId);
             saveStoredVideos(videos);
@@ -484,8 +538,104 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             initVideoTable();
-            showToast('Video deleted from catalog.', 'info');
+            showToast('Item deleted from catalog.', 'info');
         }
+    }
+
+    // --- EDIT ITEM MODAL HANDLERS ---
+    const editVideoModal = document.getElementById('editVideoModal');
+    const editVideoForm = document.getElementById('editVideoForm');
+    const closeEditModalBtn = document.getElementById('closeEditModalBtn');
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
+
+    function openEditModal(video) {
+        if (!editVideoModal) return;
+        document.getElementById('editVideoId').value = video.id;
+        document.getElementById('editVideoTitle').value = video.title || '';
+        document.getElementById('editVideoUrl').value = video.url || '';
+        document.getElementById('editVideoCategory').value = video.category || 'Short Form';
+        document.getElementById('editVideoOrientation').value = video.orientation || 'vertical';
+        document.getElementById('editVideoDesc').value = video.description || '';
+        document.getElementById('editVideoFeatured').checked = !!video.isFeatured;
+        document.getElementById('editVideoSpotlight').checked = !!video.isSpotlight;
+
+        editVideoModal.classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+        if (editVideoModal) editVideoModal.classList.add('hidden');
+    }
+
+    if (closeEditModalBtn) closeEditModalBtn.addEventListener('click', closeEditModal);
+    if (cancelEditBtn) cancelEditBtn.addEventListener('click', closeEditModal);
+
+    if (editVideoForm) {
+        editVideoForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editVideoId').value;
+            const title = document.getElementById('editVideoTitle').value.trim();
+            const url = document.getElementById('editVideoUrl').value.trim();
+            const category = document.getElementById('editVideoCategory').value;
+            const orientation = document.getElementById('editVideoOrientation').value;
+            const description = document.getElementById('editVideoDesc').value.trim();
+            const isFeatured = document.getElementById('editVideoFeatured').checked;
+            const isSpotlight = document.getElementById('editVideoSpotlight').checked;
+
+            if (!id || !title || !url) {
+                showToast('Please fill out all required fields.', 'error');
+                return;
+            }
+
+            let videos = getStoredVideos();
+            const videoIndex = videos.findIndex(v => v.id === id);
+
+            if (videoIndex === -1) {
+                showToast('Item not found.', 'error');
+                closeEditModal();
+                return;
+            }
+
+            if (isSpotlight) {
+                videos.forEach(v => {
+                    if (v.id !== id) v.isSpotlight = false;
+                });
+            }
+
+            const updatedVideo = {
+                ...videos[videoIndex],
+                title,
+                url,
+                category,
+                orientation,
+                description,
+                isFeatured,
+                isSpotlight,
+                updatedAt: new Date().toISOString()
+            };
+
+            videos[videoIndex] = updatedVideo;
+            saveStoredVideos(videos);
+
+            // Save to Firebase Firestore Cloud Database
+            if (isFirebaseConfigured && db) {
+                try {
+                    await setDoc(doc(db, "videos", id), updatedVideo, { merge: true });
+                    if (isSpotlight) {
+                        for (const v of videos) {
+                            if (v.id !== id) {
+                                await updateDoc(doc(db, "videos", v.id), { isSpotlight: false });
+                            }
+                        }
+                    }
+                } catch (err) {
+                    console.error("Error updating item in Firestore:", err);
+                }
+            }
+
+            closeEditModal();
+            showToast(`Item "${title}" updated successfully!`, 'success');
+            initVideoTable();
+        });
     }
 
     // Clear Catalog
